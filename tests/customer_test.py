@@ -1,31 +1,28 @@
 import unittest
 from src.customer import Customer
-from src.pub import Pub
-from src.drink import Drink
-from src.food import Food
 
 class TestCustomer(unittest.TestCase):
-
+    
     def setUp(self):
-        self.thomas = Customer("Thomas", 100.00, 30)
-        self.callum = Customer("Callum", 1.00, 32)
-        self.underage_guy = Customer("Todd", 1000, 17)
-        self.pub = Pub("The Prancing Pony", 100.00)
-        random_drink = Drink("Vodka", 4.50, 1)
-        self.pub.add_drink_to_drinks(random_drink)
+        self.customer1 = Customer("Tom", 100, 30)
+        self.customer2 = Customer("Callum", 100, 32)
+    
+    def test_give_money(self):
+        self.customer1.give_money(31)
+        self.assertEqual(69, self.customer1.wallet)
+        
+    def test_drink(self):
+        self.customer2.drink(5)
+        self.assertEqual(5, self.customer2.drunkness)
+    
+    def test_eat(self):
+        self.customer2.drink(5)
+        self.customer2.eat(4)
+        self.assertEqual(1, self.customer2.drunkness)
+        
+    def test_eat_more_than_drunkness(self):
+        self.customer1.drink(5)
+        self.customer1.eat(10)
+        self.assertEqual(0, self.customer1.drunkness)
 
-    def test_can_afford_drink(self):
-        drink = self.pub.drinks[0]
-        can_afford = self.thomas.can_afford_drink(drink)
-        self.assertEqual(True, can_afford)
-
-    def test_cannot_afford_drink(self):
-        drink = self.pub.drinks[0]
-        can_afford = self.callum.can_afford_drink(drink)
-        self.assertEqual(False, can_afford)
-
-    def test_use_money(self):
-        drink_object = self.pub.drinks[0]
-        self.thomas.use_money(drink_object)
-        self.assertEqual(95.5, self.thomas.wallet)
-
+   

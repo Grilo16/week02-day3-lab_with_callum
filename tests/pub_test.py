@@ -4,86 +4,261 @@ from src.drink import Drink
 from src.customer import Customer
 from src.food import Food
 
-# creating a class called TestPub thats parameters is inherited from unittest.TestCase
-
-
 class TestPub(unittest.TestCase):
 
+    # Set up mock situation
     def setUp(self):
-        self.thomas = Customer("Thomas", 100.00, 30)
-        self.thomas.drunkness = 7
-        self.callum = Customer("Callum", 4, 32)
-        self.underage_guy = Customer("Todd", 1000, 17)
-        self.drunk_guy = Customer("Hobo Bob", 5, 75)
-        self.drunk_guy.drunkness = 12
-        self.pub = Pub("The Prancing Pony", 100.00)
-        random_drink = Drink("Vodka", 4.50, 1)
-        self.pub.add_drink_to_drinks(random_drink)
-        random_food = Food("Burger", 4, 1, 10)
-        random_food2 = Food("Tacos", 2, 1, 20)
-        self.pub.add_food_to_fridge(random_food)
-        self.pub.add_food_to_fridge(random_food2)
-
-    # the above function is called the Pub class and assinging the pub name as The Prancing Pony and the till
-    # float of 100.00. setUp(self) will always reset the pub back to these initial parameters.
-
-    def test_pub_has_name(self):
-        self.assertEqual("The Prancing Pony", self.pub.name)
-
-    def test_had_till(self):
-        self.assertEqual(100.00, self.pub.till)
-
-    def test_increase_till(self):
-        self.pub.increase_till(self.pub.drinks[0])
-        self.assertEqual(104.50, self.pub.till)
-
-    # this can also be written in the format below which will assign variables which are passed as arguments
-    # the self asset arguments.
-
-    # def test_add(self):
-    #     self.pub.increase_till(2.50)
-    #     expected = 102.50
-    #     actual = self.pub.till
-    #     self.assertEqual(expected, actual)
-
-    def test_add_drink_to_drinks(self):
-        self.assertEqual(1, len(self.pub.drinks))
-
-    def test_add_food_to_fridge(self):
-        self.assertEqual(1, len(self.pub.fridge))
-
-    def test_drink_sale_successful_money(self):
-        drink = self.pub.drinks[0]
-        self.pub.drink_sale(self.thomas, drink)
-        self.assertEqual(104.5, self.pub.till)
-        self.assertEqual(8, self.thomas.drunkness)
-
-    def test_drink_sale_unsuccessful_money(self):
-        drink = self.pub.drinks[0]
-        self.pub.drink_sale(self.callum, drink)
-        self.assertEqual(100, self.pub.till)
-        self.assertEqual(0, self.callum.drunkness)
-
-    def test_drink_sale_unsuccessful_underage(self):
-        drink = self.pub.drinks[0]
-        self.pub.drink_sale(self.underage_guy, drink)
-        self.assertEqual(100, self.pub.till)
-        self.assertEqual(0, self.underage_guy.drunkness)
+        # Initialize a pub with 1000 on the till
+        self.pub = Pub("The King's Goat", 1000)
+        
+        # Initialize 4 drinks
+        self.drink1 = Drink("Beer", 3, 1)
+        self.drink2 = Drink("Wine", 5, 2)
+        self.drink3 = Drink("Whisky", 8, 3)
+        self.drink4 = Drink("Whisky 65yo", 1500, 3)
+        
+        # Initialize 3 foods
+        self.food1 = Food("Chips", 5 , 1)
+        self.food2 = Food("Burger", 10 , 5)
+        self.food3 = Food("Steak", 20 , 10)
+        
+        # Initialize 4 customers
+        self.customer1 = Customer("Tom", 100, 30)
+        self.customer2 = Customer("Callum", 100, 32)
+        self.customer3 = Customer("Hobo Bob", 4, 74)
+        # Making hobo bob drunk
+        self.customer3.drunkness = 27
+        self.customer4 = Customer("Cheeky Teenager", 10, 15)
+        
     
-    def test_drink_sale_unsuccessful_underage(self):
+    # Test pub has a name
+    def test_pub_has_name(self):
+        self.assertEqual("The King's Goat", self.pub.name)
+
+    # Test pub has a till
+    def test_has_till(self):
+        self.assertEqual(1000, self.pub.till)
+    
+    # Test adding to the till
+    def test_money_in(self):
+        self.pub.money_in(500)
+        self.assertEqual(1500, self.pub.till)
+        
+    # Test removing from the till
+    def test_money_out(self):
+        self.pub.money_out(500)
+        self.assertEqual(500, self.pub.till)
+
+    # Test adding a drink to stock for the first time
+    def test_add_new_drinks_to_stock(self):
+        self.pub.add_drink_to_stock(self.drink1, 50)
         drink = self.pub.drinks[0]
-        self.pub.drink_sale(self.drunk_guy, drink)
-        self.assertEqual(100, self.pub.till)
-        self.assertEqual(12, self.drunk_guy.drunkness)
+        # Check first drink name is beer
+        self.assertEqual("Beer", drink["name"])
+        # Check first drink stock is 50
+        self.assertEqual(50, drink["stock_count"])
+        # Check drinks list only has 1 item
+        self.assertEqual(1, len(self.pub.drinks))
+    
+    # Test adding to the stock of a drink item already in the list
+    def test_add_repeat_drinks_to_stock(self):
+        self.pub.add_drink_to_stock(self.drink1, 50)
+        self.pub.add_drink_to_stock(self.drink1, 50)
+        drink = self.pub.drinks[0]
+        # Check list is still only one item
+        self.assertEqual(1, len(self.pub.drinks))
+        # Check stock count of that item has increased to 100
+        self.assertEqual(100, drink["stock_count"])
+        
+    # Test adding a food to stock for the first time
+    def test_add_new_foods_to_stock(self):
+        self.pub.add_food_to_stock(self.food1, 50)
+        food = self.pub.foods[0]
+        # Check first food name is Chips
+        self.assertEqual("Chips", food["name"])
+        # Check first food stock is 50
+        self.assertEqual(50, food["stock_count"])
+        # Check foods list only has 1 item
+        self.assertEqual(1, len(self.pub.foods))
+    
+    # Test adding to the stock of a food item already in the list
+    def test_add_repeat_food_to_stock(self):
+        self.pub.add_food_to_stock(self.food1, 50)
+        self.pub.add_food_to_stock(self.food1, 50)
+        food = self.pub.foods[0]
+        # Check list is still only one item
+        self.assertEqual(1, len(self.pub.foods))
+        # Check stock count of that item has increased to 100
+        self.assertEqual(100, food["stock_count"])
+    
+    # Check if adults appropriately return true 
+    def test_check_customer_age_over18(self):
+        check_result = self.pub.check_customer_age(self.customer1)
+        self.assertEqual(True, check_result)
 
-    def test_food_sale_successful_drunkness_7(self):
-        food = self.pub.fridge[0]
-        self.pub.food_sale(self.thomas, food)
-        self.assertEqual(104, self.pub.till)
-        self.assertEqual(6, self.thomas.drunkness)
+    # Check if underage kids return false
+    def test_check_customer_age_underage(self):
+        check_result = self.pub.check_customer_age(self.customer4)
+        self.assertEqual(False, check_result)
+        
+    # Check returns false if too drunk
+    def test_check_drunkness_drunk(self):
+        self.customer1.drunkness = 15
+        check_result = self.pub.check_customer_drunkness(self.customer1)
+        self.assertEqual(False, check_result)
+        
+    # Check return True for sober
+    def test_check_drunkness_sober(self):
+        check_result = self.pub.check_customer_drunkness(self.customer1)
+        self.assertEqual(True, check_result)
+        
+    # Testing a function to get a drink or a food item by name
+    def test_get_item_by_type_and_name(self):
+        self.pub.add_food_to_stock(self.food2, 50)
+        item = self.pub.get_item_by_type_and_name("food", "Burger")
+        self.assertEqual("Burger", item["name"])
+        self.assertEqual(50, item["stock_count"])
+        
+    # test returns true when costumer can afford drinks
+    def test_can_afford_drink(self):
+        self.pub.add_drink_to_stock(self.drink3, 50)
+        check_result = self.pub.can_afford_drink(self.customer1, "Whisky")
+        self.assertEqual(True, check_result)
+    
+    # test returns false when customer cannot afford drinks
+    def test_cannot_afford_drink(self):
+        self.pub.add_drink_to_stock(self.drink3, 50)
+        check_result = self.pub.can_afford_drink(self.customer3, "Whisky")
+        self.assertEqual(False, check_result)
 
-    def test_food_sale_successful_drunkness_0(self):
-        food = self.pub.fridge[0]
-        self.pub.food_sale(self.callum, food)
-        self.assertEqual(104, self.pub.till)
-        self.assertEqual(0, self.callum.drunkness)
+    # test returns true when costumer can afford foods
+    def test_can_afford_food(self):
+        self.pub.add_food_to_stock(self.food3, 50)
+        check_result = self.pub.can_afford_food(self.customer2, "Steak")
+        self.assertEqual(True, check_result)
+    
+    # test returns false when customer cannot afford foods
+    def test_cannot_afford_food(self):
+        self.pub.add_food_to_stock(self.food3, 50)
+        check_result = self.pub.can_afford_food(self.customer3, "Steak")
+        self.assertEqual(False, check_result)
+       
+    # Checks it returns true when drink is in stock
+    def test_check_drink_available(self):
+        self.pub.add_drink_to_stock(self.drink2, 10)
+        check_result = self.pub.check_drink_available_by_name("Wine")
+        self.assertEqual(True, check_result)
+
+    # Check it returns false when drink not available
+    def test_check_drink_not_available(self):
+        check_result = self.pub.check_drink_available_by_name("Frangelico")
+        self.assertEqual(False, check_result)
+        
+    # Checks it returns true when food is in stock
+    def test_check_food_available(self):
+        self.pub.add_food_to_stock(self.food2, 10)
+        check_result = self.pub.check_food_available_by_name("Burger")
+        self.assertEqual(True, check_result)
+
+    # Check it returns false when food not available
+    def test_check_food_not_available(self):
+        check_result = self.pub.check_food_available_by_name("Banana")
+        self.assertEqual(False, check_result)
+    
+    
+    # Check if can sell drink returns true under the apropriate conditions
+    def test_check_can_sell_drink(self):
+        self.pub.add_drink_to_stock(self.drink3, 10)
+        check_result = self.pub.check_can_sell_drink(self.customer1, "Whisky")
+        self.assertEqual(True, check_result)
+        
+    # Check it returns false if customer is too drunk
+    def test_check_can_sell_to_hobo_bob(self):
+        self.pub.add_drink_to_stock(self.drink1, 10)
+        check_result = self.pub.check_can_sell_drink(self.customer3, "Beer")
+        self.assertEqual(False, check_result)
+        
+    # Check it returns false if customer is underage
+    def test_check_can_sell_to_cheeky_teenager(self):
+        self.pub.add_drink_to_stock(self.drink1, 10)
+        check_result = self.pub.check_can_sell_drink(self.customer4, "Beer")
+        self.assertEqual(False, check_result)
+        
+    # Check it returns false if customer doesnt have money
+    def test_check_can_sell_to_omega_expensive(self):
+        self.pub.add_drink_to_stock(self.drink4, 1)
+        check_result = self.pub.check_can_sell_drink(self.customer2, "Whisky 65yo")
+        self.assertEqual(False, check_result)
+    
+    # Check it returns false if item not in stock
+    def test_check_can_sell_drink_not_available(self):
+        self.pub.add_drink_to_stock(self.drink1, 0)
+        check_result = self.pub.check_can_sell_drink(self.customer2, "Beer")
+        self.assertEqual(False, check_result)
+            
+    # Check if can sell food returns true under the apropriate conditions
+    def test_check_can_sell_food(self):
+        self.pub.add_food_to_stock(self.food3, 10)
+        check_result = self.pub.check_can_sell_food(self.customer1, "Steak")
+        self.assertEqual(True, check_result)
+    
+    # Check it returns false if item not in stock
+    def test_check_can_sell_food_not_available(self):
+        self.pub.add_food_to_stock(self.food1, 0)
+        check_result = self.pub.check_can_sell_food(self.customer2, "Chips")
+        self.assertEqual(False, check_result)
+        
+    # Checks if drink is sold, money is taken, drunkness is increased 
+    def test_sell_drink_successfull(self):
+        self.pub.add_drink_to_stock(self.drink3, 10)
+        self.pub.sell_drink(self.customer1, "Whisky")
+        self.assertEqual(92, self.customer1.wallet)
+        self.assertEqual(1008, self.pub.till)
+        self.assertEqual(3, self.customer1.drunkness)
+        
+    # Checks if drink is not sold, money is taken, drunkness stays the same
+    # failed by drink too expensive
+    def test_sell_drink_unsuccessfull_too_expensive(self):
+        self.pub.add_drink_to_stock(self.drink4, 10)
+        self.pub.sell_drink(self.customer1, "Whisky 65yo")
+        self.assertEqual(100, self.customer1.wallet)
+        self.assertEqual(1000, self.pub.till)
+        self.assertEqual(0, self.customer1.drunkness)
+        
+    # failed by drink not in stock
+    def test_sell_drink_unsuccessfull_unavailable(self):
+        self.pub.add_drink_to_stock(self.drink2, 0)
+        self.pub.sell_drink(self.customer1, "Wine")
+        self.assertEqual(100, self.customer1.wallet)
+        self.assertEqual(1000, self.pub.till)
+        self.assertEqual(0, self.customer1.drunkness)
+    
+        
+    # Checks if food is sold, money is taken, drunkness is decreased
+    def test_sell_food_successfull(self):
+        # Giving a pound to hobo bob
+        self.customer3.wallet += 1
+        
+        self.pub.add_food_to_stock(self.food1, 10)
+        self.pub.sell_food(self.customer3, "Chips")
+        self.assertEqual(0, self.customer3.wallet)
+        self.assertEqual(1005, self.pub.till)
+        self.assertEqual(26, self.customer3.drunkness)
+        
+    # Checks if food is not sold, money is taken, drunkness stays the same
+    # failed by food too expensive
+    def test_sell_food_unsuccessfull_too_expensive(self):
+        self.pub.add_food_to_stock(self.food3, 10)
+        self.pub.sell_food(self.customer3, "Steak")
+        self.assertEqual(4, self.customer3.wallet)
+        self.assertEqual(1000, self.pub.till)
+        self.assertEqual(27, self.customer3.drunkness)
+        
+    # failed by food not in stock
+    def test_sell_food_unsuccessfull_unavailable(self):
+        self.pub.add_food_to_stock(self.food2, 0)
+        self.pub.sell_food(self.customer2, "Burger")
+        self.assertEqual(100, self.customer2.wallet)
+        self.assertEqual(1000, self.pub.till)
+        self.assertEqual(0, self.customer2.drunkness)
+    
