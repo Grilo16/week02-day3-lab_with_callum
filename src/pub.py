@@ -127,6 +127,8 @@ class Pub:
             return False
 
         # Get drink object
+        # Remove 1 from stock
+        self.get_item_by_type_and_name("drink", drink_name)["stock_count"] -= 1
         drink = self.get_item_by_type_and_name("drink", drink_name)["drink_object"]
         # add drinks price to the till
         self.money_in(drink.price)
@@ -141,7 +143,11 @@ class Pub:
             return False
         
         # Get food object
+        # Remove 1 from stock
+        self.get_item_by_type_and_name("food", food_name)["stock_count"] -= 1
+        
         food = self.get_item_by_type_and_name("food", food_name)["food_object"]
+
         # add foods price to the till
         self.money_in(food.price)        
         # Take money from customer's wallet

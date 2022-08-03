@@ -215,6 +215,7 @@ class TestPub(unittest.TestCase):
         self.assertEqual(92, self.customer1.wallet)
         self.assertEqual(1008, self.pub.till)
         self.assertEqual(3, self.customer1.drunkness)
+        self.assertEqual(9, self.pub.get_item_by_type_and_name("drink","Whisky")["stock_count"])
         
     # Checks if drink is not sold, money is taken, drunkness stays the same
     # failed by drink too expensive
@@ -224,6 +225,7 @@ class TestPub(unittest.TestCase):
         self.assertEqual(100, self.customer1.wallet)
         self.assertEqual(1000, self.pub.till)
         self.assertEqual(0, self.customer1.drunkness)
+        self.assertEqual(10, self.pub.get_item_by_type_and_name("drink","Whisky 65yo")["stock_count"])
         
     # failed by drink not in stock
     def test_sell_drink_unsuccessfull_unavailable(self):
@@ -232,6 +234,7 @@ class TestPub(unittest.TestCase):
         self.assertEqual(100, self.customer1.wallet)
         self.assertEqual(1000, self.pub.till)
         self.assertEqual(0, self.customer1.drunkness)
+        self.assertEqual(0, self.pub.get_item_by_type_and_name("drink","Wine")["stock_count"])
     
         
     # Checks if food is sold, money is taken, drunkness is decreased
@@ -244,6 +247,7 @@ class TestPub(unittest.TestCase):
         self.assertEqual(0, self.customer3.wallet)
         self.assertEqual(1005, self.pub.till)
         self.assertEqual(26, self.customer3.drunkness)
+        self.assertEqual(9, self.pub.get_item_by_type_and_name("food","Chips")["stock_count"])
         
     # Checks if food is not sold, money is taken, drunkness stays the same
     # failed by food too expensive
@@ -253,6 +257,7 @@ class TestPub(unittest.TestCase):
         self.assertEqual(4, self.customer3.wallet)
         self.assertEqual(1000, self.pub.till)
         self.assertEqual(27, self.customer3.drunkness)
+        self.assertEqual(10, self.pub.get_item_by_type_and_name("food","Steak")["stock_count"])
         
     # failed by food not in stock
     def test_sell_food_unsuccessfull_unavailable(self):
@@ -261,4 +266,5 @@ class TestPub(unittest.TestCase):
         self.assertEqual(100, self.customer2.wallet)
         self.assertEqual(1000, self.pub.till)
         self.assertEqual(0, self.customer2.drunkness)
+        self.assertEqual(0, self.pub.get_item_by_type_and_name("food","Burger")["stock_count"])
     
